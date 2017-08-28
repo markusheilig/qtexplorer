@@ -38,3 +38,6 @@ HEADERS  += mainwindow.h \
     settingscontroller.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    res.qrc
