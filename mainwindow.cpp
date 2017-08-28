@@ -10,6 +10,8 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QSystemTrayIcon>
+
 #include "settingscontroller.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -22,11 +24,17 @@ MainWindow::MainWindow(QWidget *parent) :
     fileController->addObserver(ui->tableView);
 
     connect(fileController, SIGNAL(startedFileLoading(QDir)), this, SLOT(onStartedFileLoading(QDir)));
-    connect(fileController, SIGNAL(finishedFileLoading(QDir)), this, SLOT(onFinishedFileLoading(QDir)));
+    connect(fileController, SIGNAL(finishedFileLoading(QDir)), this, SLOT(onFinishedFileLoading(QDir)));        
+    connect(fileController, SIGNAL(directoryChanged(QFileInfo)), this, SLOT(onDirectoryChanged(QFileInfo)));
+
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setIcon(QIcon(":/panda.jpg"));
+    trayIcon->show();
 
     loadAndApplySettings();
 }
@@ -42,7 +50,7 @@ void MainWindow::loadAndApplySettings()
     if (s.valid) {
         move(s.windowPosition);
         resize(s.windowSize);
-        fileController->loadDirectory(QDir(s.lastOpenedDir));
+        fileController->loadDirectoryAsync(QDir(s.lastOpenedDir));        
     }
 }
 
@@ -70,7 +78,7 @@ void MainWindow::onOpenDirectoryClicked()
     QString path = QFileDialog::getExistingDirectory(this, tr("Verzeichnis auswählen"), fileController->getDir().absolutePath(),
                                                      QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly);
     if (!path.isEmpty()) {
-        fileController->loadDirectory(QDir(path));
+        fileController->loadDirectoryAsync(QDir(path));
     }
 }
 
@@ -92,6 +100,11 @@ void MainWindow::onFinishedFileLoading(const QDir &dir)
         ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + italic(path) + "</i> gefunden");
     }
     ui->openDirectory->setEnabled(true);
+}
+
+void MainWindow::onFileChanged(const QString &file)
+{
+    trayIcon->showMessage("New File", file);
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
@@ -119,5 +132,10 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
     scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
     QProcess::execute("/usr/bin/osascript", scriptArgs);
 #endif
+}
+
+void MainWindow::onDirectoryChanged(const QFileInfo &info)
+{
+    trayIcon->showMessage("dir removed", info.baseName());
 }
 

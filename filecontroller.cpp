@@ -5,8 +5,8 @@
 
 FileController::FileController(QObject *parent)
     : QObject(parent)
-{
-    connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
+{                
+    connect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
 }
 
 FileController::~FileController()
@@ -64,23 +64,23 @@ void FileController::loadDirectoryAsync()
     emit finishedFileLoading(dir);
 }
 
-void FileController::loadDirectory(const QDir &dir)
+void FileController::loadDirectoryAsync(const QDir &dir)
 {
     watcher.removePath(dir.absolutePath());
     if (dir.exists()) {
         this->dir = dir;
-        qDebug() << watcher.addPath(dir.absolutePath());
+        watcher.addPath(dir.absolutePath());
         emit startedFileLoading(dir);
         QtConcurrent::run(this, &FileController::loadDirectoryAsync);
     }
 }
 
+void FileController::onDirectoryChanged(const QString &path)
+{
+    emit directoryChanged(QFileInfo(path));
+}
+
 QFileInfo FileController::getFileAt(int row) const
 {
     return model.getFileAt(row);
-}
-
-void FileController::onFileChanged(const QString &filePath)
-{
-    qDebug() << "changed: " << filePath;
 }
