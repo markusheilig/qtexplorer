@@ -7,7 +7,6 @@
 #include <QSettings>
 
 #include "filemodel.h"
-#include "filecontroller.h"
 #include <QFutureWatcher>
 #include <QSystemTrayIcon>
 
@@ -28,21 +27,19 @@ protected:
 
 private:
     Ui::MainWindow *ui;        
-    FileController *fileController;
+    FileModel model;
     QSystemTrayIcon *trayIcon;
 
 private slots:
     void loadAndApplySettings();
     void saveSettings();
     void onOpenDirectoryClicked();
-    void onStartedFileLoading(const QDir &dir);
-    void onFinishedFileLoading(const QDir &dir);
+    void onStartedFileLoading();
+    void onFinishedFileLoading();
     void onFileChanged(const QString &file);
 
     void handleDoubleClick(const QModelIndex &index);
-    void openFileExplorerAt(const QString &pathIn);
-
-    void onDirectoryChanged(const QFileInfo &info);
+    void openFileExplorerAt(const QString &pathIn);    
 };
 
 #endif // MAINWINDOW_H
