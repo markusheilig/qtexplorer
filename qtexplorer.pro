@@ -29,12 +29,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     filemodel.cpp \
-    filecontroller.cpp \
     settingscontroller.cpp
 
 HEADERS  += mainwindow.h \
     filemodel.h \
-    filecontroller.h \
     settingscontroller.h
 
 FORMS    += mainwindow.ui

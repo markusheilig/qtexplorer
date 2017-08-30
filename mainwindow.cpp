@@ -20,12 +20,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);    
 
-    fileController = new FileController(this);
-    fileController->addObserver(ui->tableView);
+    ui->tableView->setModel(&model);
 
-    connect(fileController, SIGNAL(startedFileLoading(QDir)), this, SLOT(onStartedFileLoading(QDir)));
-    connect(fileController, SIGNAL(finishedFileLoading(QDir)), this, SLOT(onFinishedFileLoading(QDir)));        
-    connect(fileController, SIGNAL(directoryChanged(QFileInfo)), this, SLOT(onDirectoryChanged(QFileInfo)));
+    connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
+    connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
 
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
@@ -50,14 +48,14 @@ void MainWindow::loadAndApplySettings()
     if (s.valid) {
         move(s.windowPosition);
         resize(s.windowSize);
-        fileController->loadDirectoryAsync(QDir(s.lastOpenedDir));        
+        model.loadDirectory(QDir(s.lastOpenedDir));
     }
 }
 
 void MainWindow::saveSettings()
 {
     Settings s;
-    s.lastOpenedDir = fileController->getDir().absolutePath();
+    s.lastOpenedDir = model.getDir().absolutePath();
     s.windowPosition = pos();
     s.windowSize = size();
     SettingsController::save(s);
@@ -75,23 +73,23 @@ QString italic(const QString &s) {
 
 void MainWindow::onOpenDirectoryClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Verzeichnis auswählen"), fileController->getDir().absolutePath(),
+    QString path = QFileDialog::getExistingDirectory(this, tr("Verzeichnis auswählen"), model.getDir().absolutePath(),
                                                      QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly);
     if (!path.isEmpty()) {
-        fileController->loadDirectoryAsync(QDir(path));
+        model.loadDirectory(QDir(path));
     }
 }
 
-void MainWindow::onStartedFileLoading(const QDir &dir)
-{
+void MainWindow::onStartedFileLoading()
+{    
     ui->openDirectory->setEnabled(false);
-    ui->currentDirectory->setText("Lade Dateien in " + italic(dir.absolutePath()));
+    ui->currentDirectory->setText("Lade Dateien in " + italic(model.getDir().absolutePath()));
 }
 
-void MainWindow::onFinishedFileLoading(const QDir &dir)
-{
-    const QString path = dir.absolutePath();
-    const int numberOfFiles = fileController->numberOfFiles();
+void MainWindow::onFinishedFileLoading()
+{    
+    const QString path = model.getDir().absolutePath();
+    const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
         ui->currentDirectory->setText("Verzeichnis " + italic(path) + " enthält keine Dateien");
     } else if (numberOfFiles == 1) {
@@ -108,9 +106,9 @@ void MainWindow::onFileChanged(const QString &file)
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
-{
-    QString selectedFile = fileController->getFileAt(index.row()).absoluteFilePath();
-    openFileExplorerAt(selectedFile);
+{    
+    QString path = model.getFileAt(index.row()).absoluteFilePath();
+    openFileExplorerAt(path);
 }
 
 void MainWindow::openFileExplorerAt(const QString &filePath)
@@ -134,8 +132,4 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
 #endif
 }
 
-void MainWindow::onDirectoryChanged(const QFileInfo &info)
-{
-    trayIcon->showMessage("dir removed", info.baseName());
-}
 
