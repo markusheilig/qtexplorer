@@ -104,22 +104,26 @@ void MainWindow::onFinishedFileLoading()
     ui->openDirectory->setEnabled(true);
 }
 
+QString removeLastChar(const QString &text) {
+    return text.left(text.length() - 1);
+}
+
 void MainWindow::onFileUpdate(QStringList newFiles, QStringList updatedFiles)
 {
     QString message = "";
     if (!newFiles.isEmpty()) {
-        message += "> Neue Dateien: ";
+        message += "> Neue Dateien:";
         foreach (QString newFile, newFiles) {
-            message += newFile + ",";
+            message += " " + newFile + ",";
         }
-        message = message.left(message.length() - 1);
+        message = removeLastChar(message);
     }
     if (!updatedFiles.isEmpty()) {
-        message += "\n> Änderungen: ";
+        message += "\n> Änderungen:";
         foreach (QString updatedFile, updatedFiles) {
-            message += updatedFile + ",";
+            message += " " + updatedFile + ",";
         }
-        message = message.left(message.length() - 1);
+        message = removeLastChar(message);
     }
     trayIcon->showMessage("Update", message);
 }
