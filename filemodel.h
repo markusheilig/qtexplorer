@@ -5,6 +5,8 @@
 #include <QFileInfoList>
 #include <QDir>
 #include <QFileSystemWatcher>
+#include <QSet>
+#include <QPair>
 
 enum Columns {
     lastModified,
@@ -13,8 +15,12 @@ enum Columns {
     columns_len
 };
 
+typedef QSet<QString> QStringSet;
+
 class FileModel : public QAbstractTableModel
 {
+    Q_OBJECT
+
 public:
     FileModel();
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -26,20 +32,28 @@ public:
     void loadDirectory(const QDir &dir);
     QDir getDir() const;
 
+signals:
+    void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
+
 private:
-    QFileInfoList files;
+    QFileInfoList modelList;    
+    QStringSet knownFiles;
+    QStringSet knownDirectories;
     QDir dir;
     QFileSystemWatcher watcher;
 
-    void loadDirectoryAsync();
-    int getRow(const QFileInfo &info) const;
-    bool contains(const QFileInfo &info) const;
-    //bool removeFile(const QFileInfo &info);
-    QDateTime getLastModified(const QFileInfo &info);
+    QPair<QFileInfoList, QFileInfoList> getDirectoriesAndFiles(const QDir &dir) const;
+    QFileInfoList toFileInfoList(const QStringSet &filePaths) const;
+    QFileInfoList sortByLastModified(const QFileInfoList &files) const;
+    QFileInfo getFileInfoByPath(const QString &absoluteFilePath) const;
+    QStringSet getAbsolutePaths(const QFileInfoList &paths) const;
+    QStringSet checkUpdatedFiles(const QStringSet &filesToCheck) const;
+    QDateTime getLastKnownModifiedDate(const QFileInfo &info) const;
+    QStringList getRelativeFilePaths(const QStringList &absolutePaths) const;
+    void loadDirectoryAsync();    
 
 private slots:
-    void onDirectoryChanged(const QString &path);
-    void onFileChanged(const QString &path);
+    void onDirectoryChanged(const QString &path);    
 };
 
 #endif // FILEMODEL_H

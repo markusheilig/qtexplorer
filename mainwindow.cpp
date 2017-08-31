@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
     connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
+    connect(&model, SIGNAL(fileUpdate(QStringList,QStringList)), this, SLOT(onFileUpdate(QStringList, QStringList)));
 
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
@@ -48,6 +49,7 @@ void MainWindow::loadAndApplySettings()
     if (s.valid) {
         move(s.windowPosition);
         resize(s.windowSize);
+        if (QDir(s.lastOpenedDir).exists())
         model.loadDirectory(QDir(s.lastOpenedDir));
     }
 }
@@ -55,7 +57,9 @@ void MainWindow::loadAndApplySettings()
 void MainWindow::saveSettings()
 {
     Settings s;
-    s.lastOpenedDir = model.getDir().absolutePath();
+    if (model.getDir().exists()) {
+        s.lastOpenedDir = model.getDir().absolutePath();
+    }
     s.windowPosition = pos();
     s.windowSize = size();
     SettingsController::save(s);
@@ -100,9 +104,24 @@ void MainWindow::onFinishedFileLoading()
     ui->openDirectory->setEnabled(true);
 }
 
-void MainWindow::onFileChanged(const QString &file)
+void MainWindow::onFileUpdate(QStringList newFiles, QStringList updatedFiles)
 {
-    trayIcon->showMessage("New File", file);
+    QString message = "";
+    if (!newFiles.isEmpty()) {
+        message += "> Neue Dateien: ";
+        foreach (QString newFile, newFiles) {
+            message += newFile + ",";
+        }
+        message = message.left(message.length() - 1);
+    }
+    if (!updatedFiles.isEmpty()) {
+        message += "\n> Änderungen: ";
+        foreach (QString updatedFile, updatedFiles) {
+            message += updatedFile + ",";
+        }
+        message = message.left(message.length() - 1);
+    }
+    trayIcon->showMessage("Update", message);
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
