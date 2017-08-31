@@ -104,27 +104,21 @@ void MainWindow::onFinishedFileLoading()
     ui->openDirectory->setEnabled(true);
 }
 
-QString removeLastChar(const QString &text) {
-    return text.left(text.length() - 1);
+QString buildMessage(const QString &topic, const QStringList &files) {
+    if (files.isEmpty()) {
+        return "";
+    }
+    QString message = "> " + topic + ":";
+    foreach (const QString &file, files) {
+        message += " " + file + ",";
+    }
+    return message.left(message.length() - 1);
 }
 
-void MainWindow::onFileUpdate(QStringList newFiles, QStringList updatedFiles)
+void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles)
 {
-    QString message = "";
-    if (!newFiles.isEmpty()) {
-        message += "> Neue Dateien:";
-        foreach (QString newFile, newFiles) {
-            message += " " + newFile + ",";
-        }
-        message = removeLastChar(message);
-    }
-    if (!updatedFiles.isEmpty()) {
-        message += "\n> Änderungen:";
-        foreach (QString updatedFile, updatedFiles) {
-            message += " " + updatedFile + ",";
-        }
-        message = removeLastChar(message);
-    }
+    QString message = buildMessage("Neue Dateien", newFiles);
+    message += buildMessage("Änderungen", updatedFiles);
     trayIcon->showMessage("Update", message);
 }
 
