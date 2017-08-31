@@ -36,7 +36,7 @@ private slots:
     void onOpenDirectoryClicked();
     void onStartedFileLoading();
     void onFinishedFileLoading();
-    void onFileUpdate(QStringList newFiles, QStringList updatedFiles);
+    void onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
 
     void handleDoubleClick(const QModelIndex &index);
     void openFileExplorerAt(const QString &pathIn);    
