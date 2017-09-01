@@ -37,5 +37,16 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+RC_ICONS = panda.ico
+
+# mac os
+ICON = panda.ico
+
+#windows
+RC_FILE = res.rc
+
 RESOURCES += \
     res.qrc
+
+DISTFILES += \
+    res.rc
