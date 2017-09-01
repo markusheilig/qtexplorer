@@ -19,8 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);    
+    setWindowIcon(QIcon(":/panda"));
 
-    ui->tableView->setModel(&model);
+    ui->tableView->setModel(&model);    
 
     connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
     connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
@@ -32,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
 
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/panda.jpg"));
+    trayIcon->setIcon(QIcon(":/panda"));
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(onMessageClicked()));
     trayIcon->show();
 
     loadAndApplySettings();
@@ -49,8 +51,10 @@ void MainWindow::loadAndApplySettings()
     if (s.valid) {
         move(s.windowPosition);
         resize(s.windowSize);
-        if (QDir(s.lastOpenedDir).exists())
-        model.loadDirectory(QDir(s.lastOpenedDir));
+        QDir lastOpened = QDir(s.lastOpenedDir);
+        if (lastOpened.exists()) {
+            model.loadDirectory(lastOpened);
+        }
     }
 }
 
@@ -71,8 +75,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void MainWindow::hideEvent(QHideEvent *event)
+{
+    hide();
+    event->ignore();
+}
+
 QString italic(const QString &s) {
     return "<i>" + s + "</i>";
+}
+
+QString bold(const QString &s) {
+    return "<b>" + s + "</b>";
 }
 
 void MainWindow::onOpenDirectoryClicked()
@@ -87,7 +101,7 @@ void MainWindow::onOpenDirectoryClicked()
 void MainWindow::onStartedFileLoading()
 {    
     ui->openDirectory->setEnabled(false);
-    ui->currentDirectory->setText("Lade Dateien in " + italic(model.getDir().absolutePath()));
+    ui->currentDirectory->setText("Lade Dateien in " + bold(italic(model.getDir().absolutePath())));
 }
 
 void MainWindow::onFinishedFileLoading()
@@ -95,11 +109,11 @@ void MainWindow::onFinishedFileLoading()
     const QString path = model.getDir().absolutePath();
     const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
-        ui->currentDirectory->setText("Verzeichnis " + italic(path) + " enthält keine Dateien");
+        ui->currentDirectory->setText("Verzeichnis " + bold(italic(path)) + " enthält keine Dateien");
     } else if (numberOfFiles == 1) {
-        ui->currentDirectory->setText("1 Datei in " + italic(path) + " gefunden");
+        ui->currentDirectory->setText("1 Datei in " + bold(italic(path)) + " gefunden");
     } else {
-        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + italic(path) + "</i> gefunden");
+        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + bold(italic(path)) + "</i> gefunden");
     }
     ui->openDirectory->setEnabled(true);
 }
@@ -120,6 +134,11 @@ void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &up
     QString message = buildMessage("Neue Dateien", newFiles);
     message += buildMessage("Änderungen", updatedFiles);
     trayIcon->showMessage("Update", message);
+}
+
+void MainWindow::onMessageClicked()
+{
+
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
