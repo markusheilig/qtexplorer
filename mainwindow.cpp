@@ -110,14 +110,14 @@ void MainWindow::onStartedFileLoading()
 
 void MainWindow::onFinishedFileLoading()
 {    
-    const QString path = model.getDir().absolutePath();
+    const QString path = highlight(model.getDir().absolutePath());
     const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
-        ui->currentDirectory->setText("Verzeichnis " + highlight(path) + " enthält keine Dateien");
+        ui->currentDirectory->setText("Verzeichnis " + path + " enthält keine Dateien");
     } else if (numberOfFiles == 1) {
-        ui->currentDirectory->setText("1 Datei in " + highlight(path) + " gefunden");
+        ui->currentDirectory->setText("1 Datei in " + path + " gefunden");
     } else {
-        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + highlight(path) + "</i> gefunden");
+        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + path + "</i> gefunden");
     }
     ui->openDirectory->setEnabled(true);
 }
