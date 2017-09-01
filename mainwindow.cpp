@@ -89,6 +89,10 @@ QString bold(const QString &s) {
     return "<b>" + s + "</b>";
 }
 
+QString highlight(const QString &s) {
+    return bold(italic(s));
+}
+
 void MainWindow::onOpenDirectoryClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Verzeichnis auswählen"), model.getDir().absolutePath(),
@@ -101,7 +105,7 @@ void MainWindow::onOpenDirectoryClicked()
 void MainWindow::onStartedFileLoading()
 {    
     ui->openDirectory->setEnabled(false);
-    ui->currentDirectory->setText("Lade Dateien in " + bold(italic(model.getDir().absolutePath())));
+    ui->currentDirectory->setText("Lade Dateien in " + highlight(model.getDir().absolutePath()));
 }
 
 void MainWindow::onFinishedFileLoading()
@@ -109,11 +113,11 @@ void MainWindow::onFinishedFileLoading()
     const QString path = model.getDir().absolutePath();
     const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
-        ui->currentDirectory->setText("Verzeichnis " + bold(italic(path)) + " enthält keine Dateien");
+        ui->currentDirectory->setText("Verzeichnis " + highlight(path) + " enthält keine Dateien");
     } else if (numberOfFiles == 1) {
-        ui->currentDirectory->setText("1 Datei in " + bold(italic(path)) + " gefunden");
+        ui->currentDirectory->setText("1 Datei in " + highlight(path) + " gefunden");
     } else {
-        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + bold(italic(path)) + "</i> gefunden");
+        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + highlight(path) + "</i> gefunden");
     }
     ui->openDirectory->setEnabled(true);
 }
