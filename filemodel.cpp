@@ -5,8 +5,14 @@
 
 FileModel::FileModel()
   : QAbstractTableModel()
+{   
+    timer.start(3000);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(checkForFileChanges()), Qt::QueuedConnection);
+}
+
+FileModel::~FileModel()
 {
-    connect(&watcher, &QFileSystemWatcher::directoryChanged, this, &FileModel::onDirectoryChanged);
+    timer.stop();
 }
 
 QVariant FileModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -163,18 +169,14 @@ QFileInfo FileModel::getFileInfoByPath(const QString &absoluteFilePath) const
 }
 
 
-void FileModel::onDirectoryChanged(const QString &path)
-{
-    Q_UNUSED(path);
-
+void FileModel::checkForFileChanges()
+{    
     emit beginResetModel();
 
     QPair<QFileInfoList, QFileInfoList> tuple = getDirectoriesAndFiles(dir);
     QStringSet directories = getAbsolutePaths(tuple.first);
-    QStringSet files = getAbsolutePaths(tuple.second);
-    QStringSet newDirectories = QStringSet(directories).subtract(knownDirectories);
-    QStringSet newFiles = QStringSet(files).subtract(knownFiles);
-    QStringSet removedDirectories = QStringSet(knownDirectories).subtract(directories);
+    QStringSet files = getAbsolutePaths(tuple.second);    
+    QStringSet newFiles = QStringSet(files).subtract(knownFiles);    
     QStringSet removedFiles = QStringSet(knownFiles).subtract(files);
     QStringSet existingFiles = QStringSet(knownFiles).intersect(files);
     QStringSet updatedFiles = checkUpdatedFiles(existingFiles);
@@ -195,18 +197,6 @@ void FileModel::onDirectoryChanged(const QString &path)
     knownDirectories = directories;
     knownFiles = files;
 
-    // add new files and directories to watcher
-    QStringList watch = QStringSet(newDirectories).unite(newFiles).toList();
-    if (!watch.isEmpty()) {
-        watcher.addPaths(watch);
-    }
-
-    // discard removed files and directories from watcher
-    QStringList unwatch = QStringSet(removedDirectories).unite(removedFiles).toList();
-    if (!unwatch.isEmpty()) {
-        watcher.removePaths(unwatch);
-    }
-
     // send signals
     if (!newFiles.isEmpty() || !updatedFiles.isEmpty()) {
         emit fileUpdate(getRelativeFilePaths(newFiles.toList()),
@@ -220,11 +210,6 @@ void FileModel::loadDirectoryAsync()
 {
     beginResetModel();
 
-    QStringList unwatch = knownDirectories.unite(knownDirectories).toList();
-    if (!unwatch.isEmpty()) {
-        watcher.removePaths(unwatch);
-    }
-
     QPair<QFileInfoList, QFileInfoList> tuple = getDirectoriesAndFiles(dir);
     QFileInfoList dirs = tuple.first;
     QFileInfoList files = tuple.second;
@@ -233,11 +218,6 @@ void FileModel::loadDirectoryAsync()
     std::reverse(modelList.begin(), modelList.end());
     knownDirectories = getAbsolutePaths(dirs);
     knownFiles = getAbsolutePaths(files);
-
-    QStringList watch = knownDirectories.unite(knownDirectories).toList();
-    if (!watch.isEmpty()) {
-        watcher.addPaths(watch);
-    }
 
     endResetModel();
 }

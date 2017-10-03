@@ -4,9 +4,9 @@
 #include <QAbstractTableModel>
 #include <QFileInfoList>
 #include <QDir>
-#include <QFileSystemWatcher>
 #include <QSet>
 #include <QPair>
+#include <QTimer>
 
 enum Columns {
     lastModified,
@@ -23,6 +23,7 @@ class FileModel : public QAbstractTableModel
 
 public:
     FileModel();
+    ~FileModel();
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -39,8 +40,8 @@ private:
     QFileInfoList modelList;    
     QStringSet knownFiles;
     QStringSet knownDirectories;
-    QDir dir;
-    QFileSystemWatcher watcher;
+    QDir dir;    
+    QTimer timer;
 
     QPair<QFileInfoList, QFileInfoList> getDirectoriesAndFiles(const QDir &dir) const;
     QFileInfoList toFileInfoList(const QStringSet &filePaths) const;
@@ -53,7 +54,7 @@ private:
     void loadDirectoryAsync();    
 
 private slots:
-    void onDirectoryChanged(const QString &path);    
+    void checkForFileChanges();
 };
 
 #endif // FILEMODEL_H
