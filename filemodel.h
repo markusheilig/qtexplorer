@@ -33,6 +33,9 @@ public:
     void loadDirectory(const QDir &dir);
     QDir getDir() const;
 
+public slots:
+    void setFileCheckInterval(int sec);
+
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
 

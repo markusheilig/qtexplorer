@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
 
+    connect(ui->timeout, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
+
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
 
     trayIcon = new QSystemTrayIcon(this);
@@ -50,7 +52,8 @@ void MainWindow::loadAndApplySettings()
     Settings s = SettingsController::parse();
     if (s.valid) {
         move(s.windowPosition);
-        resize(s.windowSize);
+        resize(s.windowSize);        
+        ui->timeout->setValue(s.fileCheckInterval);
         QDir lastOpened = QDir(s.lastOpenedDir);
         if (lastOpened.exists()) {
             model.loadDirectory(lastOpened);
@@ -66,6 +69,7 @@ void MainWindow::saveSettings()
     }
     s.windowPosition = pos();
     s.windowSize = size();
+    s.fileCheckInterval = ui->timeout->value();
     SettingsController::save(s);
 }
 

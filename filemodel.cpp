@@ -79,6 +79,14 @@ QDir FileModel::getDir() const
     return dir;
 }
 
+void FileModel::setFileCheckInterval(int sec)
+{
+    const int msec = sec * 1000;
+    if (msec > 0 && msec != timer.interval()) {
+        timer.setInterval(msec);
+    }
+}
+
 QPair<QFileInfoList, QFileInfoList> FileModel::getDirectoriesAndFiles(const QDir &dir) const
 {
     QFileInfoList dirs;
