@@ -5,8 +5,7 @@
 
 FileModel::FileModel()
   : QAbstractTableModel()
-{   
-    timer.start(3000);
+{       
     connect(&timer, SIGNAL(timeout()), this, SLOT(checkForFileChanges()), Qt::QueuedConnection);
 }
 
@@ -87,8 +86,8 @@ int minutesToMilliseconds(int minutes)
 void FileModel::setFileCheckInterval(int minutes)
 {
     const int msec = minutesToMilliseconds(minutes);
-    if (msec > 0 && msec != timer.interval()) {
-        timer.setInterval(msec);
+    if (msec > 0) {
+        timer.start(msec);
     }
 }
 
