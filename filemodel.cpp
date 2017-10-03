@@ -219,6 +219,11 @@ void FileModel::checkForFileChanges()
     emit endResetModel();
 }
 
+void FileModel::restartTimer()
+{
+    timer.start();
+}
+
 void FileModel::loadDirectoryAsync()
 {
     beginResetModel();

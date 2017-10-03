@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
 
     connect(ui->fileCheckInterval, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
+    connect(ui->checkForUpdates, SIGNAL(clicked(bool)), this, SLOT(onCheckForUpdatesClicked()));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
 
@@ -142,6 +143,12 @@ void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &up
     QString message = buildMessage("Neue Dateien", newFiles);
     message += buildMessage("Änderungen", updatedFiles);
     trayIcon->showMessage("Update", message);
+}
+
+void MainWindow::onCheckForUpdatesClicked()
+{
+    model.checkForFileChanges();
+    model.restartTimer();
 }
 
 void MainWindow::onMessageClicked()

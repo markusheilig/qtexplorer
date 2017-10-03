@@ -38,7 +38,7 @@ private slots:
     void onStartedFileLoading();
     void onFinishedFileLoading();
     void onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
-
+    void onCheckForUpdatesClicked();
     void onMessageClicked();
 
     void handleDoubleClick(const QModelIndex &index);

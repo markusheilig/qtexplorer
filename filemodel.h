@@ -31,10 +31,12 @@ public:
     QFileInfo getFileAt(int row) const;
 
     void loadDirectory(const QDir &dir);
-    QDir getDir() const;
+    QDir getDir() const;    
 
 public slots:
     void setFileCheckInterval(int minutes);
+    void checkForFileChanges();
+    void restartTimer();
 
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
@@ -56,8 +58,6 @@ private:
     QStringList getRelativeFilePaths(const QStringList &absolutePaths) const;
     void loadDirectoryAsync();    
 
-private slots:
-    void checkForFileChanges();
 };
 
 #endif // FILEMODEL_H
