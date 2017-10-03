@@ -34,7 +34,7 @@ public:
     QDir getDir() const;
 
 public slots:
-    void setFileCheckInterval(int sec);
+    void setFileCheckInterval(int minutes);
 
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);

@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
 
-    connect(ui->timeout, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
+    connect(ui->fileCheckInterval, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
 
@@ -53,7 +53,7 @@ void MainWindow::loadAndApplySettings()
     if (s.valid) {
         move(s.windowPosition);
         resize(s.windowSize);        
-        ui->timeout->setValue(s.fileCheckInterval);
+        ui->fileCheckInterval->setValue(s.fileCheckIntervalInMinutes);
         QDir lastOpened = QDir(s.lastOpenedDir);
         if (lastOpened.exists()) {
             model.loadDirectory(lastOpened);
@@ -69,7 +69,7 @@ void MainWindow::saveSettings()
     }
     s.windowPosition = pos();
     s.windowSize = size();
-    s.fileCheckInterval = ui->timeout->value();
+    s.fileCheckIntervalInMinutes = ui->fileCheckInterval->value();
     SettingsController::save(s);
 }
 

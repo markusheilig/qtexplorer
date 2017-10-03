@@ -22,7 +22,7 @@ struct Settings {
     QSize windowSize;
     QPoint windowPosition;
     QString lastOpenedDir;
-    int fileCheckInterval;
+    int fileCheckIntervalInMinutes;
     bool valid = false;
 };
 

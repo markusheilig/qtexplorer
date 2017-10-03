@@ -63,24 +63,24 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="timeout">
+       <widget class="QSpinBox" name="fileCheckInterval">
         <property name="suffix">
-         <string> sek</string>
+         <string>  min</string>
         </property>
         <property name="prefix">
          <string/>
         </property>
         <property name="minimum">
-         <number>10</number>
+         <number>1</number>
         </property>
         <property name="maximum">
-         <number>300</number>
+         <number>30</number>
         </property>
         <property name="singleStep">
-         <number>10</number>
+         <number>1</number>
         </property>
         <property name="value">
-         <number>30</number>
+         <number>5</number>
         </property>
        </widget>
       </item>

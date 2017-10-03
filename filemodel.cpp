@@ -79,9 +79,14 @@ QDir FileModel::getDir() const
     return dir;
 }
 
-void FileModel::setFileCheckInterval(int sec)
+int minutesToMilliseconds(int minutes)
 {
-    const int msec = sec * 1000;
+    return minutes * 60 * 1000;
+}
+
+void FileModel::setFileCheckInterval(int minutes)
+{
+    const int msec = minutesToMilliseconds(minutes);
     if (msec > 0 && msec != timer.interval()) {
         timer.setInterval(msec);
     }

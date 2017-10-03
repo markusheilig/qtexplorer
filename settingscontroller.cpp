@@ -13,7 +13,7 @@ const QString windowSize = "windowSize";
 const QString width = "width";
 const QString height = "height";
 const QString lastDir = "lastDir";
-const QString fileCheckInterval = "fileCheckInterval";
+const QString fileCheckIntervalInMinutes = "fileCheckIntervalInMinutes";
 
 SettingsController::SettingsController()
 {
@@ -36,7 +36,7 @@ Settings SettingsController::parse()
         settings.windowPosition = QPoint(json[windowPosition].toObject()[x].toInt(), json[windowPosition].toObject()[y].toInt());
         settings.windowSize = QSize(json[windowSize].toObject()[width].toInt(), json[windowSize].toObject()[height].toInt());
         settings.lastOpenedDir = json[lastDir].toString();
-        settings.fileCheckInterval = json[fileCheckInterval].toInt();
+        settings.fileCheckIntervalInMinutes = json[fileCheckIntervalInMinutes].toInt();
         settings.valid = true;
     }
 
@@ -48,7 +48,7 @@ void SettingsController::save(const Settings &settings)
     QJsonObject json;
 
     json[lastDir] = settings.lastOpenedDir;
-    json[fileCheckInterval] = settings.fileCheckInterval;
+    json[fileCheckIntervalInMinutes] = settings.fileCheckIntervalInMinutes;
 
     QJsonObject wPos;
     wPos[x] = settings.windowPosition.x();
