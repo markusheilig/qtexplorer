@@ -38,9 +38,8 @@ private slots:
     void onStartedFileLoading();
     void onFinishedFileLoading();
     void onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
-    void onCheckForUpdatesClicked();
-    void onMessageClicked();
-    void onActivated(QSystemTrayIcon::ActivationReason reason);
+    void onCheckForUpdatesClicked();    
+    void showWindowAndBringToFront();
 
     void handleDoubleClick(const QModelIndex &index);
     void openFileExplorerAt(const QString &pathIn);

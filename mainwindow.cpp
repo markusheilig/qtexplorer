@@ -37,8 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/panda"));
-    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(onMessageClicked()));
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showWindowAndBringToFront()));
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(showWindowAndBringToFront()));
     trayIcon->show();
 
     loadAndApplySettings();
@@ -153,12 +154,7 @@ void MainWindow::onCheckForUpdatesClicked()
     model.restartTimer();
 }
 
-void MainWindow::onMessageClicked()
-{
-
-}
-
-void MainWindow::onActivated(QSystemTrayIcon::ActivationReason reason)
+void MainWindow::showWindowAndBringToFront()
 {
     if (!isVisible()) {
             show();
@@ -168,7 +164,7 @@ void MainWindow::onActivated(QSystemTrayIcon::ActivationReason reason)
 #elif defined(Q_OS_WIN)
             activateWindow();
 #endif
-        }
+    }
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
