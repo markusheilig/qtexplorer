@@ -18,10 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
     setWindowIcon(QIcon(":/panda"));
 
-    ui->tableView->setModel(&model);    
+    ui->tableView->setModel(&model);
 
     connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
     connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
@@ -33,11 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->fileCheckInterval, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
     connect(ui->checkForUpdates, SIGNAL(clicked(bool)), this, SLOT(onCheckForUpdatesClicked()));
 
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);    
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/panda"));
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(onMessageClicked()));
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
     trayIcon->show();
 
     loadAndApplySettings();
@@ -53,13 +54,14 @@ void MainWindow::loadAndApplySettings()
     Settings s = SettingsController::parse();
     if (s.valid) {
         move(s.windowPosition);
-        resize(s.windowSize);        
+        resize(s.windowSize);
         ui->fileCheckInterval->setValue(s.fileCheckIntervalInMinutes);
         QDir lastOpened = QDir(s.lastOpenedDir);
         if (lastOpened.exists()) {
             model.loadDirectory(lastOpened);
         }
     }
+    model.setFileCheckInterval(ui->fileCheckInterval->value());
 }
 
 void MainWindow::saveSettings()
@@ -75,7 +77,7 @@ void MainWindow::saveSettings()
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
-{    
+{
     saveSettings();
     event->accept();
 }
@@ -108,13 +110,13 @@ void MainWindow::onOpenDirectoryClicked()
 }
 
 void MainWindow::onStartedFileLoading()
-{    
+{
     ui->openDirectory->setEnabled(false);
     ui->currentDirectory->setText("Lade Dateien in " + highlight(model.getDir().absolutePath()));
 }
 
 void MainWindow::onFinishedFileLoading()
-{    
+{
     const QString path = highlight(model.getDir().absolutePath());
     const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
@@ -156,8 +158,18 @@ void MainWindow::onMessageClicked()
 
 }
 
+void MainWindow::onActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    Q_UNUSED(reason);
+    if (!isVisible()) {
+        show();
+        raise();
+        setFocus();
+    }
+}
+
 void MainWindow::handleDoubleClick(const QModelIndex &index)
-{    
+{
     QString path = model.getFileAt(index.row()).absoluteFilePath();
     openFileExplorerAt(path);
 }
@@ -167,10 +179,10 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
 #if defined(Q_OS_WIN)
     const QString explorer = "C:/Windows/explorer.exe";
     QString param;
-    if (!QFileInfo(pathIn).isDir()) {
+    if (!QFileInfo(filePath).isDir()) {
         param = QLatin1String("/select,");
     }
-    param += QDir::toNativeSeparators(pathIn);
+    param += QDir::toNativeSeparators(filePath);
     QString command = explorer + " " + param;
     QProcess::startDetached(command);
 #elif defined(Q_OS_MAC)

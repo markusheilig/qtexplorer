@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
+#include <QDebug>
 
 const QString windowPosition = "windowPosition";
 const QString x = "x";
@@ -29,7 +30,9 @@ Settings SettingsController::parse()
 {
     Settings settings;
 
-    QFile file(getSettingsFilePath());
+    QString settingsFilePath = getSettingsFilePath();
+    qDebug() << "settings file path: " << settingsFilePath;
+    QFile file(settingsFilePath);
     if (file.open(QIODevice::ReadOnly)) {
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         QJsonObject json = doc.object();

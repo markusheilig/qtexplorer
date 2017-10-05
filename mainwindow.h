@@ -27,7 +27,7 @@ protected:
     void hideEvent(QHideEvent *event);
 
 private:
-    Ui::MainWindow *ui;        
+    Ui::MainWindow *ui;
     FileModel model;
     QSystemTrayIcon *trayIcon;
 
@@ -40,9 +40,10 @@ private slots:
     void onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
     void onCheckForUpdatesClicked();
     void onMessageClicked();
+    void onActivated(QSystemTrayIcon::ActivationReason reason);
 
     void handleDoubleClick(const QModelIndex &index);
-    void openFileExplorerAt(const QString &pathIn);    
+    void openFileExplorerAt(const QString &pathIn);
 };
 
 #endif // MAINWINDOW_H
