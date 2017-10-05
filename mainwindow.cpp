@@ -143,8 +143,16 @@ QString buildMessage(const QString &topic, const QStringList &files) {
 
 void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles)
 {
-    QString message = buildMessage("Neue Dateien", newFiles);
-    message += buildMessage("Änderungen", updatedFiles);
+    QString message;
+    if (!newFiles.isEmpty()) {
+        message = buildMessage("Neue Dateien", newFiles);
+    }
+    if (!updatedFiles.isEmpty()) {
+        if (!message.isEmpty()) {
+            message += "\n";
+        }
+        message += buildMessage("Änderungen", updatedFiles);
+    }
     trayIcon->showMessage("Update", message);
 }
 
