@@ -160,12 +160,15 @@ void MainWindow::onMessageClicked()
 
 void MainWindow::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    Q_UNUSED(reason);
     if (!isVisible()) {
-        show();
-        raise();
-        setFocus();
-    }
+            show();
+            setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+#if defined(Q_OS_MAC)
+            raise();
+#elif defined(Q_OS_WIN)
+            activateWindow();
+#endif
+        }
 }
 
 void MainWindow::handleDoubleClick(const QModelIndex &index)
