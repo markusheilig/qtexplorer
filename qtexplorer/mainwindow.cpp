@@ -91,16 +91,8 @@ void MainWindow::hideEvent(QHideEvent *event)
     event->ignore();
 }
 
-QString italic(const QString &s) {
-    return "<i>" + s + "</i>";
-}
-
 QString bold(const QString &s) {
     return "<b>" + s + "</b>";
-}
-
-QString highlight(const QString &s) {
-    return bold(italic(s));
 }
 
 void MainWindow::onOpenDirectoryClicked()
@@ -115,19 +107,19 @@ void MainWindow::onOpenDirectoryClicked()
 void MainWindow::onStartedFileLoading()
 {
     ui->openDirectory->setEnabled(false);
-    ui->currentDirectory->setText("Lade Dateien in " + highlight(model.getDir().absolutePath()));
+    ui->currentDirectory->setText("Lade Dateien in " + bold(model.getDir().absolutePath()));
 }
 
 void MainWindow::onFinishedFileLoading()
 {
-    const QString path = highlight(model.getDir().absolutePath());
+    const QString path = bold(model.getDir().absolutePath());
     const int numberOfFiles = model.rowCount();
     if (numberOfFiles == 0) {
-        ui->currentDirectory->setText("Verzeichnis " + path + "  enthält keine Dateien");
+        ui->currentDirectory->setText("Verzeichnis " + path + " enthält keine Dateien");
     } else if (numberOfFiles == 1) {
-        ui->currentDirectory->setText("1 Datei in " + path + "  gefunden");
+        ui->currentDirectory->setText("1 Datei in " + path + " gefunden");
     } else {
-        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + path + "</i>  gefunden");
+        ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + path + " gefunden");
     }
     ui->openDirectory->setEnabled(true);
 }
