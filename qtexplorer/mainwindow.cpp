@@ -14,12 +14,11 @@
 
 #include "settingscontroller.h"
 
-const QIcon blueBinocularsWithEyes = QIcon(":/binoculars-with-eyes");
-const QIcon redBinocularsWithEyes = QIcon(":/binoculars-with-eyes-red");
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    blueBinocularsWithEyes(QIcon(":/binoculars-with-eyes")),
+    redBinocularsWithEyes(QIcon(":/binoculars-with-eyes-red"))
 {
     ui->setupUi(this);
     setWindowIcon(blueBinocularsWithEyes);
@@ -95,6 +94,11 @@ void MainWindow::hideEvent(QHideEvent *event)
     event->ignore();
 }
 
+void MainWindow::showEvent(QShowEvent *event)
+{
+    trayIcon->setIcon(blueBinocularsWithEyes);
+}
+
 QString bold(const QString &s) {
     return "<b>" + s + "</b>";
 }
@@ -141,7 +145,9 @@ QString buildMessage(const QString &topic, const QStringList &files) {
 
 void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles)
 {
-    trayIcon->setIcon(redBinocularsWithEyes);
+    if (!isVisible()) {
+        trayIcon->setIcon(redBinocularsWithEyes);
+    }
 
     QString message;
     if (!newFiles.isEmpty()) {
@@ -165,7 +171,6 @@ void MainWindow::onCheckForUpdatesClicked()
 void MainWindow::showWindowAndBringToFront()
 {
     if (!isVisible()) {
-        trayIcon->setIcon(blueBinocularsWithEyes);
         show();
         setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 #if defined(Q_OS_MAC)
