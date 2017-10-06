@@ -14,8 +14,8 @@
    <string>qtExplorer</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/panda</normaloff>:/panda</iconset>
+   <iconset resource="res.qrc">
+    <normaloff>:/binoculars-with-eyes</normaloff>:/binoculars-with-eyes</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -162,31 +162,33 @@
      </widget>
     </item>
    </layout>
-   <widget class="QMenuBar" name="menubar">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>800</width>
-      <height>22</height>
-     </rect>
+   <action name="action_about">
+    <property name="text">
+     <string>Über...</string>
     </property>
-    <widget class="QMenu" name="menuAbout">
-     <property name="title">
-      <string>qtexplorer</string>
-     </property>
-     <addaction name="action_about"/>
-    </widget>
-    <addaction name="menuAbout"/>
-   </widget>
+   </action>
   </widget>
-  <action name="action_about">
-   <property name="text">
-    <string>Über...</string>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
    </property>
-  </action>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>qtexplorer</string>
+    </property>
+    <addaction name="action_about"/>
+   </widget>
+   <addaction name="menuAbout"/>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

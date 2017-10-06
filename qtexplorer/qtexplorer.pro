@@ -35,12 +35,13 @@ HEADERS  += mainwindow.h \
     filemodel.h \
     settingscontroller.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    mainwindowx.ui
 
-RC_ICONS = binoculars-with-eyes.svg
+RC_ICONS = binoculars-with-eyes.ico
 
 # mac os
-ICON = binoculars-with-eyes.svg
+ICON = binoculars-with-eyes.ico
 
 #windows
 RC_FILE = res.rc

@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/panda"));
+    trayIcon->setIcon(QIcon(":/binoculars-with-eyes"));
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showWindowAndBringToFront()));
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(showWindowAndBringToFront()));
@@ -207,7 +207,7 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
 void MainWindow::showAboutMessageBox()
 {
     QString message = "<h3>qtExplorer</h3><hr><div>Icons made by <a href=\"http://www.freepik.com\" title=\"Freepik\">Freepik</a> from <a href=\"https://www.flaticon.com/\" title=\"Flaticon\">www.flaticon.com</a> is licensed by <a href=\"http://creativecommons.org/licenses/by/3.0/\" title=\"Creative Commons BY 3.0\" target=\"_blank\">CC 3.0 BY</a></div>";
-    QMessageBox::about(this, "titel", message);
+    QMessageBox::about(this, "qtExplorer", message);
 }
 
 
