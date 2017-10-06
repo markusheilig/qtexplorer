@@ -10,7 +10,7 @@ FileModel::FileModel()
 }
 
 FileModel::~FileModel()
-{
+{    
     timer.stop();
 }
 
@@ -68,7 +68,7 @@ QFileInfo FileModel::getFileAt(int row) const
 void FileModel::loadDirectory(const QDir &dir)
 {
     if (dir.exists()) {
-        this->dir = dir;
+        this->dir = dir;        
         QtConcurrent::run(this, &FileModel::loadDirectoryAsync);
     }
 }

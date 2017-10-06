@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file alias="binoculars-with-eyes">binoculars-with-eyes.png</file>
+        <file alias="binoculars-with-eyes-red">binoculars-with-eyes-red.png</file>
     </qresource>
 </RCC>

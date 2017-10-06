@@ -14,12 +14,15 @@
 
 #include "settingscontroller.h"
 
+const QIcon blueBinocularsWithEyes = QIcon(":/binoculars-with-eyes");
+const QIcon redBinocularsWithEyes = QIcon(":/binoculars-with-eyes-red");
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/binoculars-with-eyes"));
+    setWindowIcon(blueBinocularsWithEyes);
 
     ui->tableView->setModel(&model);
 
@@ -38,7 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/binoculars-with-eyes"));
+    trayIcon->installEventFilter(this);
+    trayIcon->setIcon(blueBinocularsWithEyes);
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showWindowAndBringToFront()));
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(showWindowAndBringToFront()));
@@ -137,6 +141,8 @@ QString buildMessage(const QString &topic, const QStringList &files) {
 
 void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &updatedFiles)
 {
+    trayIcon->setIcon(redBinocularsWithEyes);
+
     QString message;
     if (!newFiles.isEmpty()) {
         message = buildMessage("Neue Dateien", newFiles);
@@ -159,12 +165,13 @@ void MainWindow::onCheckForUpdatesClicked()
 void MainWindow::showWindowAndBringToFront()
 {
     if (!isVisible()) {
-            show();
-            setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+        trayIcon->setIcon(blueBinocularsWithEyes);
+        show();
+        setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 #if defined(Q_OS_MAC)
-            raise();
+        raise();
 #elif defined(Q_OS_WIN)
-            activateWindow();
+        activateWindow();
 #endif
     }
 }

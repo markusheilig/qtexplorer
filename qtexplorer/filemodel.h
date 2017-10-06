@@ -7,6 +7,7 @@
 #include <QSet>
 #include <QPair>
 #include <QTimer>
+#include <QFuture>
 
 enum Columns {
     lastModified,
@@ -47,6 +48,7 @@ private:
     QStringSet knownDirectories;
     QDir dir;    
     QTimer timer;
+    QFuture<void> loadingTask;
 
     QPair<QFileInfoList, QFileInfoList> getDirectoriesAndFiles(const QDir &dir) const;
     QFileInfoList toFileInfoList(const QStringSet &filePaths) const;
@@ -56,8 +58,7 @@ private:
     QStringSet checkUpdatedFiles(const QStringSet &filesToCheck) const;
     QDateTime getLastKnownModifiedDate(const QFileInfo &info) const;
     QStringList getRelativeFilePaths(const QStringList &absolutePaths) const;
-    void loadDirectoryAsync();    
-
+    void loadDirectoryAsync();        
 };
 
 #endif // FILEMODEL_H
