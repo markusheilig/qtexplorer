@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/panda"));
+    setWindowIcon(QIcon(":/binoculars-with-eyes"));
 
     ui->tableView->setModel(&model);
 

@@ -37,10 +37,10 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-RC_ICONS = panda.ico
+RC_ICONS = binoculars-with-eyes.svg
 
 # mac os
-ICON = panda.ico
+ICON = binoculars-with-eyes.svg
 
 #windows
 RC_FILE = res.rc
