@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tableView->setModel(&model);
 
+    connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(showAboutMessageBox()));
+
     connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
     connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
     connect(&model, SIGNAL(fileUpdate(QStringList,QStringList)), this, SLOT(onFileUpdate(QStringList, QStringList)));
@@ -200,6 +202,12 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
     scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
     QProcess::execute("/usr/bin/osascript", scriptArgs);
 #endif
+}
+
+void MainWindow::showAboutMessageBox()
+{
+    QString message = "<h3>qtExplorer</h3><hr><div>Icons made by <a href=\"http://www.freepik.com\" title=\"Freepik\">Freepik</a> from <a href=\"https://www.flaticon.com/\" title=\"Flaticon\">www.flaticon.com</a> is licensed by <a href=\"http://creativecommons.org/licenses/by/3.0/\" title=\"Creative Commons BY 3.0\" target=\"_blank\">CC 3.0 BY</a></div>";
+    QMessageBox::about(this, "titel", message);
 }
 
 

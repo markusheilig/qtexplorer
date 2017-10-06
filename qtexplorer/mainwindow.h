@@ -43,6 +43,8 @@ private slots:
 
     void handleDoubleClick(const QModelIndex &index);
     void openFileExplorerAt(const QString &pathIn);
+
+    void showAboutMessageBox();
 };
 
 #endif // MAINWINDOW_H

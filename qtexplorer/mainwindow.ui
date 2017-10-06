@@ -14,7 +14,7 @@
    <string>qtExplorer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res.qrc">
+   <iconset>
     <normaloff>:/panda</normaloff>:/panda</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -162,11 +162,31 @@
      </widget>
     </item>
    </layout>
+   <widget class="QMenuBar" name="menubar">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <widget class="QMenu" name="menuAbout">
+     <property name="title">
+      <string>qtexplorer</string>
+     </property>
+     <addaction name="action_about"/>
+    </widget>
+    <addaction name="menuAbout"/>
+   </widget>
   </widget>
+  <action name="action_about">
+   <property name="text">
+    <string>Über...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
