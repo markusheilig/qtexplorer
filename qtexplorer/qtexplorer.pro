@@ -35,8 +35,7 @@ HEADERS  += mainwindow.h \
     filemodel.h \
     settingscontroller.h
 
-FORMS    += mainwindow.ui \
-    mainwindowx.ui
+FORMS    += mainwindow.ui
 
 RC_ICONS = binoculars-with-eyes.ico
 
