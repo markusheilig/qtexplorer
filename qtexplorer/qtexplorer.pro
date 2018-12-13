@@ -31,7 +31,6 @@ SOURCES += main.cpp\
     filemodel.cpp \
     settingscontroller.cpp \
     fileutils.cpp \
-    file.cpp \
     periodicfilewatcher.cpp
 
 HEADERS  += mainwindow.h \
@@ -39,7 +38,6 @@ HEADERS  += mainwindow.h \
     settingscontroller.h \
     fileutils.h \
     filesorter.h \
-    file.h \
     periodicfilewatcher.h
 
 FORMS    += mainwindow.ui
