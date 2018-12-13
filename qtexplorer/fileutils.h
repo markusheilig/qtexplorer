@@ -8,8 +8,7 @@
 class FileUtils
 {
 public:
-    static QStringList getRelativeFilePaths(const QStringList &absolutePaths, const QDir &dir);
-    static QPair<QFileInfoList, QFileInfoList> getDirectoriesAndFiles(const QDir &dir);
+    static QStringList getRelativeFilePaths(const QStringList &absolutePaths, const QDir &dir);    
     static QFileInfoList getFilesRecursive(const QDir &dir);
     static QFileInfoList toFileInfoList(const QSet<QString> &filePaths);
     static QSet<QString> getAbsolutePaths(const QFileInfoList &paths);
