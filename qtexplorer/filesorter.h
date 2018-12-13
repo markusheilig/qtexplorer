@@ -11,7 +11,7 @@
 
 class FileSorter {
 public:
-    virtual QFileInfoList sort(QPair<QFileInfoList, QFileInfoList> tuple) = 0;
+    virtual QFileInfoList sort(const QFileInfoList &filesToSort) = 0;
     virtual ~FileSorter() {}
 };
 
@@ -20,16 +20,10 @@ public:
  */
 class SortByLastModificationFileDate : public FileSorter {
 public:
-    QFileInfoList sort(QPair<QFileInfoList, QFileInfoList> tuple)
-    {
-        const QFileInfoList &files = tuple.second;
-        return sortFiles(files);
-    }
-
-    QFileInfoList sortFiles(const QFileInfoList &files)
+    QFileInfoList sort(const QFileInfoList &filesToSort)
     {
         QMultiMap<QDateTime, QFileInfo> map;
-        foreach (const QFileInfo &fi, files) {
+        foreach (const QFileInfo &fi, filesToSort) {
             map.insertMulti(fi.lastModified(), fi);
         }
 
@@ -45,10 +39,10 @@ public:
  */
 class SortByLastModificationDirectoryDate : public FileSorter {
 public:
-    QFileInfoList sort(QPair<QFileInfoList, QFileInfoList> tuple)
+    QFileInfoList sort(const QFileInfoList &filesToSort)
     {
         SortByLastModificationFileDate fileSorter;
-        QFileInfoList sortedFiles = fileSorter.sortFiles(tuple.second);
+        QFileInfoList sortedFiles = fileSorter.sort(filesToSort);
 
         QStringList dirPaths;
         Q_FOREACH (const QFileInfo &fi, sortedFiles) {
@@ -61,8 +55,8 @@ public:
         QFileInfoList result;
         foreach (const QString &dirPath, dirPaths) {
             QDir dir = dirPath;
-            QFileInfoList files = FileUtils::getFiles(dir);
-            QFileInfoList sortedFiles = fileSorter.sortFiles(files);
+            const QFileInfoList &files = FileUtils::getFiles(dir);
+            const QFileInfoList &sortedFiles = fileSorter.sort(files);
             Q_FOREACH (const QFileInfo &fi, sortedFiles) {
                 result.append(fi);
             }

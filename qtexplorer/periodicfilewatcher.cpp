@@ -31,7 +31,7 @@ void PeriodicFileWatcher::restart()
 void PeriodicFileWatcher::checkFiles()
 {
     QtConcurrent::run([=]() {
-        QPair<QFileInfoList, QFileInfoList> dirsAndFiles = FileUtils::getDirectoriesAndFiles(fileModel->getDir());
-        fileModel->update(dirsAndFiles);
+        QFileInfoList files = FileUtils::getFilesRecursive(fileModel->getDir());
+        fileModel->update(files);
     });
 }

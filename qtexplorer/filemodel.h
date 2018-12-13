@@ -32,15 +32,15 @@ public:
 
     QDir getDir() const;    
 
-    void init(const QDir &dir, const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles);
-    void update(const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles);
+    void init(const QDir &dir, const QFileInfoList &files);
+    void update(const QFileInfoList &files);
     void setFileSorter(FileSorter *fileSorter);
 
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
 
 private:
-    QPair<QFileInfoList, QFileInfoList> dirsAndFiles;
+    QFileInfoList files;
     QFileInfoList modelList;    
     QDir dir;
     FileSorter *fileSorter;

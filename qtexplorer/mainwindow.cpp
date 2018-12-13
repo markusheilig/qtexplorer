@@ -82,8 +82,8 @@ void MainWindow::loadAndApplySettings()
         }
         QDir lastOpened = QDir(s.lastOpenedDir);
         if (lastOpened.exists()) {
-            QPair<QFileInfoList, QFileInfoList> dirsAndFiles = FileUtils::getDirectoriesAndFiles(lastOpened);
-            model.init(lastOpened, dirsAndFiles);
+            QFileInfoList files = FileUtils::getFilesRecursive(lastOpened);
+            model.init(lastOpened, files);
         }
     }
     periodicFileWatcher->setInterval(ui->fileCheckInterval->value());
@@ -134,8 +134,8 @@ void MainWindow::onOpenDirectoryClicked()
                                                      QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly);
     if (!path.isEmpty()) {
         QDir d = path;
-        QPair<QFileInfoList, QFileInfoList> dirsAndFiles = FileUtils::getDirectoriesAndFiles(d);
-        model.init(d, dirsAndFiles);
+        QFileInfoList files = FileUtils::getFilesRecursive(d);
+        model.init(d, files);
     }
 }
 

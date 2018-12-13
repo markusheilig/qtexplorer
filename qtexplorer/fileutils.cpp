@@ -37,6 +37,11 @@ QPair<QFileInfoList, QFileInfoList> FileUtils::getDirectoriesAndFiles(const QDir
     return QPair<QFileInfoList, QFileInfoList>(dirs, files);
 }
 
+QFileInfoList FileUtils::getFilesRecursive(const QDir &dir)
+{
+    return getDirectoriesAndFiles(dir).second;
+}
+
 QFileInfoList FileUtils::toFileInfoList(const QSet<QString> &filePaths)
 {
     QFileInfoList list;

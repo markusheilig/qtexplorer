@@ -71,24 +71,23 @@ QDir FileModel::getDir() const
     return dir;
 }
 
-void FileModel::init(const QDir &dir, const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles)
+void FileModel::init(const QDir &dir, const QFileInfoList &files)
 {
     emit beginResetModel();
 
     this->dir = dir;
-    this->dirsAndFiles = dirsAndFiles;
-    modelList = fileSorter->sort(dirsAndFiles);
+    modelList = fileSorter->sort(files);
 
     emit endResetModel();
 }
 
-void FileModel::update(const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles)
+void FileModel::update(const QFileInfoList &theFiles)
 {
     emit beginResetModel();
 
-    QSet<QString> knownFiles = FileUtils::getAbsolutePaths(this->dirsAndFiles.second);
+    QSet<QString> knownFiles = FileUtils::getAbsolutePaths(modelList);
 
-    QSet<QString> files = FileUtils::getAbsolutePaths(dirsAndFiles.second);
+    QSet<QString> files = FileUtils::getAbsolutePaths(theFiles);
     QSet<QString> newFiles = QSet<QString>(files).subtract(knownFiles);
     QSet<QString> existingFiles = QSet<QString>(knownFiles).intersect(files);
     QSet<QString> updatedFiles = getUpdatedFiles(existingFiles);
@@ -98,8 +97,7 @@ void FileModel::update(const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles)
                         FileUtils::getRelativeFilePaths(updatedFiles.toList(), dir));
     }
 
-    this->dirsAndFiles = dirsAndFiles;
-    modelList = fileSorter->sort(dirsAndFiles);
+    modelList = fileSorter->sort(theFiles);
 
     emit endResetModel();
 }
@@ -110,7 +108,7 @@ void FileModel::setFileSorter(FileSorter *fileSorter)
 
     delete this->fileSorter;
     this->fileSorter = fileSorter;
-    modelList = fileSorter->sort(dirsAndFiles);
+    modelList = fileSorter->sort(modelList);
 
     emit endResetModel();
 }
