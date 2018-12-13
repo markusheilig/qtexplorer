@@ -7,6 +7,7 @@
 #include <QSettings>
 
 #include "filemodel.h"
+#include "periodicfilewatcher.h"
 #include <QFutureWatcher>
 #include <QSystemTrayIcon>
 
@@ -31,6 +32,7 @@ private:
     Ui::MainWindow *ui;
     FileModel model;
     QSystemTrayIcon *trayIcon;
+    PeriodicFileWatcher *periodicFileWatcher;
     const QIcon blueBinocularsWithEyes;
     const QIcon redBinocularsWithEyes;
 
@@ -47,6 +49,7 @@ private slots:
 
     void handleDoubleClick(const QModelIndex &index);
     void openFileExplorerAt(const QString &pathIn);
+    void updateSortType(const QString &sortType);
 
     void showAboutMessageBox();
 };

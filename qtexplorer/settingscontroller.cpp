@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDebug>
 
+
 const QString windowPosition = "windowPosition";
 const QString x = "x";
 const QString y = "y";
@@ -15,6 +16,7 @@ const QString width = "width";
 const QString height = "height";
 const QString lastDir = "lastDir";
 const QString fileCheckIntervalInMinutes = "fileCheckIntervalInMinutes";
+const QString sortType = "sortType";
 
 SettingsController::SettingsController()
 {
@@ -40,6 +42,11 @@ Settings SettingsController::parse()
         settings.windowSize = QSize(json[windowSize].toObject()[width].toInt(), json[windowSize].toObject()[height].toInt());
         settings.lastOpenedDir = json[lastDir].toString();
         settings.fileCheckIntervalInMinutes = json[fileCheckIntervalInMinutes].toInt();
+
+        if (json.contains(sortType) && json[sortType].isString()) {
+            settings.updateSortType(json[sortType].toString());
+        }
+
         settings.valid = true;
     }
 
@@ -52,6 +59,7 @@ void SettingsController::save(const Settings &settings)
 
     json[lastDir] = settings.lastOpenedDir;
     json[fileCheckIntervalInMinutes] = settings.fileCheckIntervalInMinutes;
+    json[sortType] = settings.sortTypeAsString();
 
     QJsonObject wPos;
     wPos[x] = settings.windowPosition.x();

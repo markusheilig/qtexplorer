@@ -13,6 +13,10 @@
 #include <QSystemTrayIcon>
 
 #include "settingscontroller.h"
+#include "fileutils.h"
+
+#define TEXT_SORT_BY_FILE "Dateiupdate"
+#define TEXT_SORT_BY_DIR "Ordnerupdate"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,18 +27,24 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindowIcon(blueBinocularsWithEyes);
 
+    periodicFileWatcher = new PeriodicFileWatcher(&model);
+
     ui->tableView->setModel(&model);
+
+    ui->sortType->addItems(QStringList() << TEXT_SORT_BY_FILE << TEXT_SORT_BY_DIR);
+    ui->sortType->setCurrentIndex(0);
+    connect(ui->sortType, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateSortType(QString)));
 
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(showAboutMessageBox()));
 
-    connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()));
-    connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()));
+    connect(&model, SIGNAL(modelAboutToBeReset()), this, SLOT(onStartedFileLoading()), Qt::QueuedConnection);
+    connect(&model, SIGNAL(modelReset()), this, SLOT(onFinishedFileLoading()), Qt::QueuedConnection);
     connect(&model, SIGNAL(fileUpdate(QStringList,QStringList)), this, SLOT(onFileUpdate(QStringList, QStringList)));
 
     connect(ui->openDirectory, SIGNAL(clicked(bool)), this, SLOT(onOpenDirectoryClicked()));
     connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleDoubleClick(QModelIndex)));
 
-    connect(ui->fileCheckInterval, SIGNAL(valueChanged(int)), &model, SLOT(setFileCheckInterval(int)));
+    connect(ui->fileCheckInterval, SIGNAL(valueChanged(int)), periodicFileWatcher, SLOT(setInterval(int)));
     connect(ui->checkForUpdates, SIGNAL(clicked(bool)), this, SLOT(onCheckForUpdatesClicked()));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -52,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete periodicFileWatcher;
     delete ui;
 }
 
@@ -62,12 +73,20 @@ void MainWindow::loadAndApplySettings()
         move(s.windowPosition);
         resize(s.windowSize);
         ui->fileCheckInterval->setValue(s.fileCheckIntervalInMinutes);
+        if (s.sortType == Settings::SortByDir) {
+            ui->sortType->setCurrentText(TEXT_SORT_BY_DIR);
+            model.setFileSorter(new SortByLastModificationDirectoryDate());
+        } else {
+            ui->sortType->setCurrentText(TEXT_SORT_BY_FILE);
+            model.setFileSorter(new SortByLastModificationFileDate());
+        }
         QDir lastOpened = QDir(s.lastOpenedDir);
         if (lastOpened.exists()) {
-            model.loadDirectory(lastOpened);
+            QPair<QFileInfoList, QFileInfoList> dirsAndFiles = FileUtils::getDirectoriesAndFiles(lastOpened);
+            model.init(lastOpened, dirsAndFiles);
         }
     }
-    model.setFileCheckInterval(ui->fileCheckInterval->value());
+    periodicFileWatcher->setInterval(ui->fileCheckInterval->value());
 }
 
 void MainWindow::saveSettings()
@@ -79,6 +98,11 @@ void MainWindow::saveSettings()
     s.windowPosition = pos();
     s.windowSize = size();
     s.fileCheckIntervalInMinutes = ui->fileCheckInterval->value();
+    if (ui->sortType->currentText() == TEXT_SORT_BY_DIR) {
+        s.sortType = Settings::SortByDir;
+    } else {
+        s.sortType = Settings::SortByFile;
+    }
     SettingsController::save(s);
 }
 
@@ -96,6 +120,7 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::showEvent(QShowEvent *event)
 {
+    Q_UNUSED(event);
     trayIcon->setIcon(blueBinocularsWithEyes);
 }
 
@@ -108,14 +133,17 @@ void MainWindow::onOpenDirectoryClicked()
     QString path = QFileDialog::getExistingDirectory(this, tr("Verzeichnis auswählen"), model.getDir().absolutePath(),
                                                      QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly);
     if (!path.isEmpty()) {
-        model.loadDirectory(QDir(path));
+        QDir d = path;
+        QPair<QFileInfoList, QFileInfoList> dirsAndFiles = FileUtils::getDirectoriesAndFiles(d);
+        model.init(d, dirsAndFiles);
     }
 }
 
 void MainWindow::onStartedFileLoading()
 {
-    ui->openDirectory->setEnabled(false);
+    this->setEnabled(false);
     ui->currentDirectory->setText("Lade Dateien in " + bold(model.getDir().absolutePath()));
+    qApp->processEvents();
 }
 
 void MainWindow::onFinishedFileLoading()
@@ -129,7 +157,7 @@ void MainWindow::onFinishedFileLoading()
     } else {
         ui->currentDirectory->setText(QString::number(numberOfFiles) + " Dateien in " + path + " gefunden");
     }
-    ui->openDirectory->setEnabled(true);
+    this->setEnabled(true);
 }
 
 QString buildMessage(const QString &topic, const QStringList &files) {
@@ -163,9 +191,10 @@ void MainWindow::onFileUpdate(const QStringList &newFiles, const QStringList &up
 }
 
 void MainWindow::onCheckForUpdatesClicked()
-{
-    model.checkForFileChanges();
-    model.restartTimer();
+{    
+    this->setEnabled(false);
+    periodicFileWatcher->checkFiles();
+    periodicFileWatcher->restart();
 }
 
 void MainWindow::showWindowAndBringToFront()
@@ -206,6 +235,15 @@ void MainWindow::openFileExplorerAt(const QString &filePath)
     scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
     QProcess::execute("/usr/bin/osascript", scriptArgs);
 #endif
+}
+
+void MainWindow::updateSortType(const QString &sortType)
+{
+    if (sortType == TEXT_SORT_BY_DIR) {
+        model.setFileSorter(new SortByLastModificationDirectoryDate());
+    } else {
+        model.setFileSorter(new SortByLastModificationFileDate());
+    }
 }
 
 void MainWindow::showAboutMessageBox()

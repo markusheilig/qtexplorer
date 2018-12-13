@@ -19,11 +19,33 @@ private:
 };
 
 struct Settings {
+
+    enum SortType { SortByFile, SortByDir };
+
     QSize windowSize;
     QPoint windowPosition;
     QString lastOpenedDir;
     int fileCheckIntervalInMinutes;
+    SortType sortType = SortByFile;
     bool valid = false;
+
+    QString sortTypeAsString() const
+    {
+        if (sortType == SortByDir) {
+            return "dir";
+        }
+        return "file";
+    }
+
+    void updateSortType(const QString &sortType)
+    {
+        if (sortType == "dir") {
+            this->sortType = SortByDir;
+        } else {
+            this->sortType = SortByFile;
+        }
+    }
+
 };
 
 

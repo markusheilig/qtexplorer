@@ -1,8 +1,8 @@
 #include "mainwindow.h"
-#include <QApplication>
 
-#include <QMetaType>
+#include <QApplication>
 #include <QDir>
+#include <QMetaType>
 
 int main(int argc, char *argv[])
 {

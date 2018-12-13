@@ -1,13 +1,14 @@
 #ifndef FILEMODEL_H
 #define FILEMODEL_H
 
+#include "filesorter.h"
+
 #include <QAbstractTableModel>
 #include <QFileInfoList>
 #include <QDir>
 #include <QSet>
 #include <QPair>
 #include <QTimer>
-#include <QFuture>
 
 enum Columns {
     lastModified,
@@ -15,8 +16,6 @@ enum Columns {
 
     columns_len
 };
-
-typedef QSet<QString> QStringSet;
 
 class FileModel : public QAbstractTableModel
 {
@@ -31,34 +30,22 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;    
     QFileInfo getFileAt(int row) const;
 
-    void loadDirectory(const QDir &dir);
     QDir getDir() const;    
 
-public slots:
-    void setFileCheckInterval(int minutes);
-    void checkForFileChanges();
-    void restartTimer();
+    void init(const QDir &dir, const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles);
+    void update(const QPair<QFileInfoList, QFileInfoList> &dirsAndFiles);
+    void setFileSorter(FileSorter *fileSorter);
 
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
 
 private:
+    QPair<QFileInfoList, QFileInfoList> dirsAndFiles;
     QFileInfoList modelList;    
-    QStringSet knownFiles;
-    QStringSet knownDirectories;
-    QDir dir;    
-    QTimer timer;
-    QFuture<void> loadingTask;
+    QDir dir;
+    FileSorter *fileSorter;
 
-    QPair<QFileInfoList, QFileInfoList> getDirectoriesAndFiles(const QDir &dir) const;
-    QFileInfoList toFileInfoList(const QStringSet &filePaths) const;
-    QFileInfoList sortByLastModified(const QFileInfoList &files) const;
-    QFileInfo getFileInfoByPath(const QString &absoluteFilePath) const;
-    QStringSet getAbsolutePaths(const QFileInfoList &paths) const;
-    QStringSet checkUpdatedFiles(const QStringSet &filesToCheck) const;
-    QDateTime getLastKnownModifiedDate(const QFileInfo &info) const;
-    QStringList getRelativeFilePaths(const QStringList &absolutePaths) const;
-    void loadDirectoryAsync();        
+    QSet<QString> getUpdatedFiles(const QSet<QString> &filesToCheck) const;
 };
 
 #endif // FILEMODEL_H
