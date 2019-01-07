@@ -39,8 +39,7 @@ public:
 signals:
     void fileUpdate(const QStringList &newFiles, const QStringList &updatedFiles);
 
-private:
-    QFileInfoList files;
+private:    
     QFileInfoList modelList;    
     QDir dir;
     FileSorter *fileSorter;
